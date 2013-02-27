@@ -1,8 +1,8 @@
 <?php
 
-require_once 'IO/SoundFont/Type/Generator.php';
-require_once 'IO/SoundFont/Type/Modulator.php';
-require_once 'IO/SoundFont/Type/Sample.php';
+require_once 'IO/SoundFont/Generator.php';
+require_once 'IO/SoundFont/Modulator.php';
+require_once 'IO/SoundFont/Sample.php';
 
 class IO_SoundFont_Chunk {
     var $id = null;
@@ -95,7 +95,7 @@ class IO_SoundFont_Chunk {
         case 'igen':
             $detailData = array();
             while ($reader->hasNextData()) {
-                $detailData []= IO_SoundFont_Type_Generator::parse($reader);
+                $detailData []= IO_SoundFont_Generator::parse($reader);
             }
             break;
         case 'inst':

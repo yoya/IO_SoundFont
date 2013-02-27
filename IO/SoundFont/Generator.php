@@ -1,13 +1,13 @@
 <?php
 
 
-$IO_SoundFont_Type_Generator_Summary = array(
+$IO_SoundFont_Generator_Summary = array(
     0 => array('Name' => 'startAddrsOffset'),
     41 => array('Name' => 'instrument'),
     53 => array('Name' => 'sampleID'),
     );
 
-class IO_SoundFont_Type_Generator {
+class IO_SoundFont_Generator {
     var $id = null;
     var $data = null;
 
@@ -24,11 +24,11 @@ class IO_SoundFont_Type_Generator {
         return $sfGen;
     }
     static function string($gen) {
-        global $IO_SoundFont_Type_Generator_Summary;
+        global $IO_SoundFont_Generator_Summary;
         $genOper = $gen['sfGenOper'];
         $ret = "genOper:$genOper";
-        if (isset($IO_SoundFont_Type_Generator_Summary[$genOper]['Name'])) {
-            $ret .= '('.$IO_SoundFont_Type_Generator_Summary[$genOper]['Name'].')';
+        if (isset($IO_SoundFont_Generator_Summary[$genOper]['Name'])) {
+            $ret .= '('.$IO_SoundFont_Generator_Summary[$genOper]['Name'].')';
         }
         if (isset($gen['Amount'])) {
             $ret .= " Amount:{$gen['Amount']}";

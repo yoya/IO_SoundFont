@@ -1,7 +1,7 @@
 <?php
 
 
-$IO_SoundFont_Type_Sample_Type = array(
+$IO_SoundFont_Sample_Type = array(
     1 => 'monoSample',
     2 => 'rightSample',
     4 => 'leftSample',
@@ -10,7 +10,7 @@ $IO_SoundFont_Type_Sample_Type = array(
     32770 => 'RomRightSample',
     );
 
-class IO_SoundFont_Type_Sample {
+class IO_SoundFont_Sample {
     var $id = null;
     var $data = null;
 
@@ -27,7 +27,7 @@ class IO_SoundFont_Type_Sample {
         return $sfGen;
     }
     static function string($sample) {
-        global $IO_SoundFont_Type_Sample_Type;
+        global $IO_SoundFont_Sample_Type;
         $sampleName      = $sample['SampleName'];
         $start           = $sample['Start'];
         $startLoop       = $sample['StartLoop'];
@@ -39,8 +39,8 @@ class IO_SoundFont_Type_Sample {
         $sampleLink      = $sample['SampleLink'];
         $sampleType      = $sample['SampleType'];
         $ret = "name:'$sampleName' start:$start loop:$startLoop=>$endLoop end:$end sampleRate:$sampleRate originalPitch:originalPitch pitchCorrection:$pitchCorrection link:$sampleLink type:sampleType";
-        if (isset($IO_SoundFont_Type_Sample_Type[$sampleType])) {
-            $ret .= '('.$IO_SoundFont_Type_Sample_Type[$sampleType].')';
+        if (isset($IO_SoundFont_Sample_Type[$sampleType])) {
+            $ret .= '('.$IO_SoundFont_Sample_Type[$sampleType].')';
         }
         return $ret;
     }

@@ -6,9 +6,9 @@
 require_once 'IO/Bit.php';
 require_once 'IO/SoundFont/Exception.php';
 require_once 'IO/SoundFont/Chunk.php';
-require_once 'IO/SoundFont/Type/Generator.php';
-require_once 'IO/SoundFont/Type/Modulator.php';
-require_once 'IO/SoundFont/Type/Sample.php';
+require_once 'IO/SoundFont/Generator.php';
+require_once 'IO/SoundFont/Modulator.php';
+require_once 'IO/SoundFont/Sample.php';
 
 class IO_SoundFont {
     var $pdtaMap = array(); // for analyze
@@ -148,7 +148,7 @@ class IO_SoundFont {
     }
     function generatorTree($gen, $indentLevel) {
         $indentSpace = str_repeat("  ", $indentLevel);
-        echo $indentSpace.IO_SoundFont_Type_Generator::string($gen).PHP_EOL;
+        echo $indentSpace.IO_SoundFont_Generator::string($gen).PHP_EOL;
         $genOper = $gen['sfGenOper'];
         if ($genOper === 41) { // instrument
             $instId = $gen['Amount'];
@@ -157,7 +157,7 @@ class IO_SoundFont {
         } else if ($genOper === 53) { // sampleID
             $sampleId = $gen['Amount'];
             $sample = $this->pdtaMap['shdr'][$sampleId];
-            echo $indentSpace.IO_SoundFont_Type_Sample::string($sample).PHP_EOL;           
+            echo $indentSpace.IO_SoundFont_Sample::string($sample).PHP_EOL;           
         }
     }
     function modulatorTree($mod, $indentLevel) {
