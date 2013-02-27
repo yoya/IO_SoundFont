@@ -158,8 +158,6 @@ class IO_SoundFont {
             $sampleId = $gen['Amount'];
             $sample = $this->pdtaMap['shdr'][$sampleId];
             echo $indentSpace.IO_SoundFont_Type_Sample::string($sample).PHP_EOL;           
-        } else {
-            echo $indentSpace.IO_SoundFont_Type_Generator::string($gen).PHP_EOL;
         }
     }
     function modulatorTree($mod, $indentLevel) {
