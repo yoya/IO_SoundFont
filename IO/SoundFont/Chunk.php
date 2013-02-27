@@ -2,7 +2,7 @@
 
 require_once 'IO/SoundFont/Type/Generator.php';
 require_once 'IO/SoundFont/Type/Modulator.php';
-require_once 'IO/SoundFont/Type/Sample.php';x
+require_once 'IO/SoundFont/Type/Sample.php';
 
 class IO_SoundFont_Chunk {
     var $id = null;
