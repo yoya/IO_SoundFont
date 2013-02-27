@@ -6,8 +6,12 @@
 require_once 'IO/Bit.php';
 require_once 'IO/SoundFont/Exception.php';
 require_once 'IO/SoundFont/Chunk.php';
+require_once 'IO/SoundFont/Type/Generator.php';
+require_once 'IO/SoundFont/Type/Modulator.php';
+require_once 'IO/SoundFont/Type/Sample.php';
 
 class IO_SoundFont {
+    var $pdtaMap = array(); // for analyze
     function parse($sfdata) {
         $reader = new IO_Bit();
         $reader->input($sfdata);
@@ -44,7 +48,7 @@ class IO_SoundFont {
         for ($remain = $size_LIST - 4; $remain >= 8 ; $remain -= (8 + $size)) {
             $chunk = new IO_SoundFont_Chunk();
             $chunk->parse($reader);
-            $chunkLIST []= $chunk;
+            $chunkLIST[$chunk->id]= $chunk;
             $size = $chunk->getDataSize();
         }
         /*
@@ -93,5 +97,89 @@ class IO_SoundFont {
         $size = $nextOfData - $startOfSize - 4;
         $writer->setUI32LE($size , $startOfSize);
         $writer->setOffset($nextOfData, 0);
+    }
+
+    function analyze() {
+        $pdtaMap = array();
+        foreach ($this->sfbk['pdta'] as $id => $pdtaEntry) {
+            $this->sfbk['pdta'][$id]->parseChunkData();
+        }
+        foreach ($this->sfbk['pdta'] as $id => $pdtaEntry) {
+            $this->pdtaMap[$id] = $pdtaEntry->analyze($this->sfbk);
+        }
+    }
+    function tree() {
+        if (isset($this->banks) === false) {
+            $this->analyze();
+        }
+        $banks = $this->pdtaMap['phdr'];
+        foreach ($banks as $bankId => $bank) {
+            echo "Bank: id:$bankId".PHP_EOL;
+            foreach ($bank as $presetId => $preset) {
+                $presetName = $preset['PresetName'];
+                $presetBagNdxStart = $preset['PresetBagNdx'];
+                $presetBagNdxEnd = $preset['_PresetBagNdxEnd'];
+                echo "  Preset: id:$presetId name:'$presetName' bag:$presetBagNdxStart=>$presetBagNdxEnd".PHP_EOL;
+                for ($presetBagNdx = $presetBagNdxStart ; $presetBagNdx <= $presetBagNdxEnd ; $presetBagNdx++) {
+                    echo "    presetBag: id:$presetBagNdx".PHP_EOL;
+                    $presetBag = $this->pdtaMap['pbag'][$presetBagNdx];
+                    $genNdxStart = $presetBag['GenNdx'];
+                    $genNdxEnd   = $presetBag['_GenNdxEnd'];
+                    $modNdxStart = $presetBag['ModNdx'];
+                    $modNdxEnd   = $presetBag['_ModNdxEnd'];
+                    $this->bagTree($presetBag, 'pgen', $genNdxStart, $genNdxEnd, 'pmod', $modNdxStart, $modNdxEnd, 3);
+                }                
+            }
+        }
+    }
+    function bagTree($bag, $genChunkId, $genNdxStart, $genNdxEnd, $modChunkId, $modNdxStart, $modNdxEnd, $indentLevel) {
+        $indentSpace = str_repeat("  ", $indentLevel);
+        for ($genId = $genNdxStart ; $genId <= $genNdxEnd ; $genId++) {
+            $gen = $this->pdtaMap[$genChunkId][$genId];
+            echo $indentSpace."Gen: id:$genId ".PHP_EOL;
+            $this->generatorTree($gen, $indentLevel + 1);
+        }
+        for ($modId = $modNdxStart ; $modId <= $modNdxEnd ; $modId++) {
+            echo $indentSpace."Mod: id:$modId ".PHP_EOL;
+            $mod = $this->pdtaMap[$modChunkId][$modId];
+            $this->modulatorTree($mod, $indentLevel + 1);
+        }
+        
+    }
+    function generatorTree($gen, $indentLevel) {
+        $indentSpace = str_repeat("  ", $indentLevel);
+        echo $indentSpace.IO_SoundFont_Type_Generator::string($gen).PHP_EOL;
+        $genOper = $gen['sfGenOper'];
+        if ($genOper === 41) { // instrument
+            $instId = $gen['Amount'];
+            $inst = $this->pdtaMap['inst'][$instId];
+            $this->instrumentTree($inst, $indentLevel + 1) ;
+        } else if ($genOper === 53) { // sampleID
+            $sampleId = $gen['Amount'];
+            $sample = $this->pdtaMap['shdr'][$sampleId];
+            echo $indentSpace.IO_SoundFont_Type_Sample::string($sample).PHP_EOL;           
+        } else {
+            echo $indentSpace.IO_SoundFont_Type_Generator::string($gen).PHP_EOL;
+        }
+    }
+    function modulatorTree($mod, $indentLevel) {
+        $indentSpace = str_repeat("  ", $indentLevel);
+        ; // TODO
+    }
+    function instrumentTree($inst, $indentLevel) {
+        $indentSpace = str_repeat("  ", $indentLevel);
+        $instName = $inst['InstName'];
+        $instBagNdxStart = $inst['InstBagNdx'];
+        $instBagNdxEnd = $inst['_InstBagNdxEnd'];
+        echo $indentSpace."name:'$instName' bagNdx: $instBagNdxStart=>$instBagNdxEnd".PHP_EOL;
+        for ($instBagId = $instBagNdxStart ; $instBagId <= $instBagNdxEnd  ; $instBagId++) {
+            echo $indentSpace."  InstBag: id:$instBagId".PHP_EOL;
+            $instBag = $this->pdtaMap['ibag'][$instBagId];
+            $genNdxStart = $instBag['GenNdx'];
+            $genNdxEnd   = $instBag['_GenNdxEnd'];
+            $modNdxStart = $instBag['ModNdx'];
+            $modNdxEnd   = $instBag['_ModNdxEnd'];
+            $this->bagTree($instBag, 'igen', $genNdxStart, $genNdxEnd, 'imod', $modNdxStart, $modNdxEnd, $indentLevel + 2);
+        }
     }
 }
