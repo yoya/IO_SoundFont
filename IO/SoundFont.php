@@ -113,15 +113,15 @@ class IO_SoundFont {
             $this->analyze();
         }
         $banks = $this->pdtaMap['phdr'];
-        foreach ($banks as $bankId => $bank) {
-            echo "Bank: id:$bankId".PHP_EOL;
-            foreach ($bank as $presetId => $preset) {
+        foreach ($banks as $bankIdx => $bank) {
+            echo "Bank: idx:$bankIdx".PHP_EOL;
+            foreach ($bank as $presetIdx => $preset) {
                 $presetName = $preset['PresetName'];
                 $presetBagNdxStart = $preset['PresetBagNdx'];
                 $presetBagNdxEnd = $preset['_PresetBagNdxEnd'];
-                echo "  Preset: id:$presetId name:'$presetName' bag:$presetBagNdxStart=>$presetBagNdxEnd".PHP_EOL;
+                echo "  Preset: idx:$presetIdx name:'$presetName' bag:$presetBagNdxStart=>$presetBagNdxEnd".PHP_EOL;
                 for ($presetBagNdx = $presetBagNdxStart ; $presetBagNdx <= $presetBagNdxEnd ; $presetBagNdx++) {
-                    echo "    presetBag: id:$presetBagNdx".PHP_EOL;
+                    echo "    presetBag: ndx:$presetBagNdx".PHP_EOL;
                     $presetBag = $this->pdtaMap['pbag'][$presetBagNdx];
                     $genNdxStart = $presetBag['GenNdx'];
                     $genNdxEnd   = $presetBag['_GenNdxEnd'];
@@ -134,14 +134,14 @@ class IO_SoundFont {
     }
     function bagTree($bag, $genChunkId, $genNdxStart, $genNdxEnd, $modChunkId, $modNdxStart, $modNdxEnd, $indentLevel) {
         $indentSpace = str_repeat("  ", $indentLevel);
-        for ($genId = $genNdxStart ; $genId <= $genNdxEnd ; $genId++) {
-            $gen = $this->pdtaMap[$genChunkId][$genId];
-            echo $indentSpace."Gen: id:$genId ".PHP_EOL;
+        for ($genIdx = $genNdxStart ; $genIdx <= $genNdxEnd ; $genIdx++) {
+            $gen = $this->pdtaMap[$genChunkId][$genIdx];
+            echo $indentSpace."Gen: idx:$genIdx ".PHP_EOL;
             $this->generatorTree($gen, $indentLevel + 1);
         }
-        for ($modId = $modNdxStart ; $modId <= $modNdxEnd ; $modId++) {
-            echo $indentSpace."Mod: id:$modId ".PHP_EOL;
-            $mod = $this->pdtaMap[$modChunkId][$modId];
+        for ($modIdx = $modNdxStart ; $modIdx <= $modNdxEnd ; $modIdx++) {
+            echo $indentSpace."Mod: idx:$modIdx ".PHP_EOL;
+            $mod = $this->pdtaMap[$modChunkId][$modIdx];
             $this->modulatorTree($mod, $indentLevel + 1);
         }
         
@@ -151,12 +151,12 @@ class IO_SoundFont {
         echo $indentSpace.IO_SoundFont_Generator::string($gen).PHP_EOL;
         $genOper = $gen['sfGenOper'];
         if ($genOper === 41) { // instrument
-            $instId = $gen['Amount'];
-            $inst = $this->pdtaMap['inst'][$instId];
+            $instIdx = $gen['Amount'];
+            $inst = $this->pdtaMap['inst'][$instIdx];
             $this->instrumentTree($inst, $indentLevel + 1) ;
         } else if ($genOper === 53) { // sampleID
-            $sampleId = $gen['Amount'];
-            $sample = $this->pdtaMap['shdr'][$sampleId];
+            $sampleIdx = $gen['Amount'];
+            $sample = $this->pdtaMap['shdr'][$sampleIdx];
             echo $indentSpace.IO_SoundFont_Sample::string($sample).PHP_EOL;           
         }
     }
@@ -170,9 +170,9 @@ class IO_SoundFont {
         $instBagNdxStart = $inst['InstBagNdx'];
         $instBagNdxEnd = $inst['_InstBagNdxEnd'];
         echo $indentSpace."name:'$instName' bagNdx: $instBagNdxStart=>$instBagNdxEnd".PHP_EOL;
-        for ($instBagId = $instBagNdxStart ; $instBagId <= $instBagNdxEnd  ; $instBagId++) {
-            echo $indentSpace."  InstBag: id:$instBagId".PHP_EOL;
-            $instBag = $this->pdtaMap['ibag'][$instBagId];
+        for ($instBagIdx = $instBagNdxStart ; $instBagIdx <= $instBagNdxEnd  ; $instBagIdx++) {
+            echo $indentSpace."  InstBag: idx:$instBagIdx".PHP_EOL;
+            $instBag = $this->pdtaMap['ibag'][$instBagIdx];
             $genNdxStart = $instBag['GenNdx'];
             $genNdxEnd   = $instBag['_GenNdxEnd'];
             $modNdxStart = $instBag['ModNdx'];
