@@ -50,7 +50,7 @@ $IO_SoundFont_Generator_Summary = array(
     45 => array('Name' => 'startloopAddrsCoarseOffset'),
     46 => array('Name' => 'keynum'),
     47 => array('Name' => 'velocity'),
-    48 => array('Name' => 'initiaalAttenuation'),
+    48 => array('Name' => 'initialAttenuation'),
     49 => array('Name' => 'reserved2'), // reserved
     50 => array('Name' => 'endloopAddrsCoarseOffset'),
     51 => array('Name' => 'coarseTune'),
