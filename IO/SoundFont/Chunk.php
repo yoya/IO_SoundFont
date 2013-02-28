@@ -83,10 +83,10 @@ class IO_SoundFont_Chunk {
             $detailData = array();
             while ($reader->hasNextData()) {
                 $sfMod = array();
-                $sfMod['sfModSrcOper'] = $reader->getUI16LE();
+                $sfMod['sfModSrcOper'] = IO_SoundFont_Modulator::parse($reader);
                 $sfMod['sfModDestOper'] = $reader->getUI16LE();
                 $sfMod['modAmount'] = $reader->getSI16LE();
-                $sfMod['sfModAmtSrcOper'] = $reader->getUI16LE();
+                $sfMod['sfModAmtSrcOper'] = IO_SoundFont_Modulator::parse($reader);
                 $sfMod['sfModTransOper'] = $reader->getUI16LE();
                 $detailData []= $sfMod;
             }
