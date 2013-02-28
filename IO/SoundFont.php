@@ -29,10 +29,10 @@ class IO_SoundFont {
             throw new IO_SoundFont_Exception("non sfbk fourcc");
         }
         $info = $this->parseChunkLIST($reader);
-        $stda = $this->parseChunkLIST($reader);
+        $sdta = $this->parseChunkLIST($reader);
         $pdta = $this->parseChunkLIST($reader);
         $this->sfbk = array(
-            'INFO' => $info, 'sdta' => $stda, 'pdta' => $pdta
+            'INFO' => $info, 'sdta' => $sdta, 'pdta' => $pdta
             );
         return true;
     }
@@ -43,7 +43,7 @@ class IO_SoundFont {
             throw new IO_SoundFont_Exception("non LIST fourcc");
         }
         $size_LIST = $reader->getUI32LE();
-        $id_LIST = $reader->getData(4); // 'INFO' or 'stda' or 'pdta'
+        $id_LIST = $reader->getData(4); // 'INFO' or 'sdta' or 'pdta'
         $chunkLIST = array();
         for ($remain = $size_LIST - 4; $remain >= 8 ; $remain -= (8 + $size)) {
             $chunk = new IO_SoundFont_Chunk();
@@ -77,7 +77,7 @@ class IO_SoundFont {
         $writer->putUI32LE(0); //
         $writer->putData('sfbk');
         $this->parseChunkLIST($writer, 'INFO', $this->sfbk['INFO']);
-        $this->parseChunkLIST($writer, 'stda', $this->sfbk['stda']);
+        $this->parseChunkLIST($writer, 'sdta', $this->sfbk['sdta']);
         $this->parseChunkLIST($writer, 'pdta', $this->sfbk['pdta']);
     }
     function buildChunkLIST($writer, $id_LIST, $chunkLIST) {
