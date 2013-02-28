@@ -95,6 +95,7 @@ class IO_SoundFont_Chunk {
         case 'igen':
             $detailData = array();
             while ($reader->hasNextData()) {
+                
                 $detailData []= IO_SoundFont_Generator::parse($reader);
             }
             break;

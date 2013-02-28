@@ -161,12 +161,17 @@ class IO_SoundFont {
         }
     }
     function modulatorTree($mod, $indentLevel) {
+        global $IO_SoundFont_Generator_Summary;
         $indentSpace = str_repeat("  ", $indentLevel);
         $destOper = $mod['sfModDestOper'] ;
         $amount = $mod['modAmount'] ;
         $transOper = $mod['sfModTransOper'] ;
         $text = IO_SoundFont_Modulator::string($mod['sfModSrcOper']);
-        $text .= " DestOper:$destOper Amount:$amount";
+        $text .= " DestOper:$destOper";
+        if (isset($IO_SoundFont_Generator_Summary[$destOper]['Name'])) {
+            $text .= '('.$IO_SoundFont_Generator_Summary[$destOper]['Name'].')';
+        }
+        $text .= " Amount:$amount";
         $text .= ' AmdSrcOper:'.IO_SoundFont_Modulator::string($mod['sfModAmtSrcOper']).PHP_EOL;
         $text .= " TransOper:$transOper";
         echo $indentSpace.$text;
