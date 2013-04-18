@@ -38,7 +38,7 @@ class IO_SoundFont_Sample {
         $pitchCorrection = $sample['PitchCorrection'];
         $sampleLink      = $sample['SampleLink'];
         $sampleType      = $sample['SampleType'];
-        $ret = "name:'$sampleName' start:$start loop:$startLoop=>$endLoop end:$end sampleRate:$sampleRate originalPitch:originalPitch pitchCorrection:$pitchCorrection link:$sampleLink type:sampleType";
+        $ret = "name:'$sampleName' start:$start loop:$startLoop=>$endLoop end:$end sampleRate:$sampleRate originalPitch:$originalPitch pitchCorrection:$pitchCorrection link:$sampleLink type:$sampleType";
         if (isset($IO_SoundFont_Sample_Type[$sampleType])) {
             $ret .= '('.$IO_SoundFont_Sample_Type[$sampleType].')';
         }
