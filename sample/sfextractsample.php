@@ -71,7 +71,7 @@ function extractGenerator($gen, $looptime) {
         } else {
             $startLoop = $sample['StartLoop'];
             $endLoop   = $sample['EndLoop'];
-            $loopCount = $looptime * $sampleRate / ($endLoop - $startLoop + 1);
+            $loopCount = $looptime * $sampleRate / ($endLoop - $startLoop /*+ 1*/);
             $loopCount = ceil($loopCount); // round up
             $sampleData = substr($data, $start * 2 , ($startLoop - $start) * 2);
             $sampleData .= str_repeat(substr($data, $startLoop * 2 , ($endLoop - $startLoop /*+ 1*/) * 2), $loopCount);
