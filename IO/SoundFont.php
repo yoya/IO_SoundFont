@@ -1,4 +1,4 @@
-<?php
+32;100;2c<?php
   /*
    http://pwiki.awm.jp/~yoya/?SoundFont   
    */
@@ -172,9 +172,9 @@ class IO_SoundFont {
             $text .= '('.$IO_SoundFont_Generator_Summary[$destOper]['Name'].')';
         }
         $text .= " Amount:$amount";
-        $text .= ' AmdSrcOper:'.IO_SoundFont_Modulator::string($mod['sfModAmtSrcOper']).PHP_EOL;
+        $text .= ' AmdSrcOper:'.IO_SoundFont_Modulator::string($mod['sfModAmtSrcOper']);
         $text .= " TransOper:$transOper";
-        echo $indentSpace.$text;
+        echo $indentSpace.$text.PHP_EOL;
     }
     function instrumentTree($inst, $indentLevel) {
         $indentSpace = str_repeat("  ", $indentLevel);
