@@ -76,9 +76,9 @@ class IO_SoundFont {
         $writer->putData('RIFF');
         $writer->putUI32LE(0); //
         $writer->putData('sfbk');
-        $this->parseChunkLIST($writer, 'INFO', $this->sfbk['INFO']);
-        $this->parseChunkLIST($writer, 'sdta', $this->sfbk['sdta']);
-        $this->parseChunkLIST($writer, 'pdta', $this->sfbk['pdta']);
+        $this->buildChunkLIST($writer, 'INFO', $this->sfbk['INFO']);
+        $this->buildChunkLIST($writer, 'sdta', $this->sfbk['sdta']);
+        $this->buildChunkLIST($writer, 'pdta', $this->sfbk['pdta']);
     }
     function buildChunkLIST($writer, $id_LIST, $chunkLIST) {
         $writer->putData('LIST');
