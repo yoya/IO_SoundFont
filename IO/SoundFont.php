@@ -1,4 +1,4 @@
-32;100;2c<?php
+<?php
   /*
    http://pwiki.awm.jp/~yoya/?SoundFont   
    */
