@@ -1,8 +1,8 @@
 <?php
 
-require_once 'IO/SoundFont/Generator.php';
-require_once 'IO/SoundFont/Modulator.php';
-require_once 'IO/SoundFont/Sample.php';
+require_once dirname(__FILE__).'/Generator.php';
+require_once dirname(__FILE__).'/Modulator.php';
+require_once dirname(__FILE__).'/Sample.php';
 
 class IO_SoundFont_Chunk {
     var $id = null;

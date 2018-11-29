@@ -3,12 +3,16 @@
    http://pwiki.awm.jp/~yoya/?SoundFont   
    */
 
-require_once 'IO/Bit.php';
-require_once 'IO/SoundFont/Exception.php';
-require_once 'IO/SoundFont/Chunk.php';
-require_once 'IO/SoundFont/Generator.php';
-require_once 'IO/SoundFont/Modulator.php';
-require_once 'IO/SoundFont/Sample.php';
+if (is_readable('vendor/autoload.php')) {
+    require 'vendor/autoload.php';
+} else {
+    require_once 'IO/Bit.php';
+}
+require_once dirname(__FILE__).'/SoundFont/Exception.php';
+require_once dirname(__FILE__).'/SoundFont/Chunk.php';
+require_once dirname(__FILE__).'/SoundFont/Generator.php';
+require_once dirname(__FILE__).'/SoundFont/Modulator.php';
+require_once dirname(__FILE__).'/SoundFont/Sample.php';
 
 class IO_SoundFont {
     var $pdtaMap = array(); // for analyze

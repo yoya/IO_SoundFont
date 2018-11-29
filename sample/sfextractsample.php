@@ -1,7 +1,11 @@
 <?php
 
-require_once 'IO/SoundFont.php';
-require_once 'IO/SoundFont/WaveData.php';
+if (is_readable('vendor/autoload.php')) {
+    require 'vendor/autoload.php';
+} else {
+    require_once 'IO/SoundFont.php';
+    require_once 'IO/SoundFont/WaveData.php';
+}
 
 if ($argc < 2) {
     echo "Usage: php sfextractsample.php <sffile> [<looptime>]".PHP_EOL;
