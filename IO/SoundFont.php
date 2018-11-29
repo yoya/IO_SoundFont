@@ -1,5 +1,7 @@
 <?php
   /*
+    IO_SoundFont - v1.1.0
+    (c) yoya@awm.jp
    http://pwiki.awm.jp/~yoya/?SoundFont   
    */
 
