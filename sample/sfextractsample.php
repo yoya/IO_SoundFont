@@ -1,7 +1,7 @@
 <?php
 
 require_once 'IO/SoundFont.php';
-require_once 'sample/makeWaveData.php';
+require_once 'IO/SoundFont/WaveData.php';
 
 if ($argc < 2) {
     echo "Usage: php sfextractsample.php <sffile> [<looptime>]".PHP_EOL;
@@ -79,7 +79,7 @@ function extractGenerator($gen, $looptime) {
         }
         $nChannel = 1; // 1:monoral, 2:stereo
         $sampleBits = 16; // 8 or 16
-        $waveData = makeWaveData($sampleData, $nChannel, $sampleBits, $sampleRate);
+        $waveData = IO_SoundFont_WaveData::makeWaveData($sampleData, $nChannel, $sampleBits, $sampleRate);
         file_put_contents($name.".wav", $waveData);
     }
 }
