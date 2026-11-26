@@ -108,5 +108,14 @@ $sf = parseSF2(sf2(array('eop' => 255)));
 $sf->analyze();
 check('phdr banks (EOP 255/255)', array(0), array_keys($sf->pdtaMap['phdr']));
 
+/*
+ * inst wInstBagNdx is unsigned (WORD)
+ */
+$chunk = new IO_SoundFont_Chunk();
+$chunk->id = 'inst';
+$chunk->data = name20('X').pack('v', 0x8000);
+$chunk->parseChunkData();
+check('inst InstBagNdx unsigned', 0x8000, $chunk->detail[0]['InstBagNdx']);
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

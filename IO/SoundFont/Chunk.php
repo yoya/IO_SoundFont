@@ -106,7 +106,7 @@ class IO_SoundFont_Chunk {
                 $sfInst = array();
                 $InstName = explode("\0", $reader->getData(20));
                 $sfInst['InstName'] = $InstName[0];
-                $sfInst['InstBagNdx'] = $reader->getSI16LE();;
+                $sfInst['InstBagNdx'] = $reader->getUI16LE();
                 $detailData []= $sfInst;
             }
             break;
