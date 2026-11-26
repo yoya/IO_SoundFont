@@ -8,6 +8,7 @@ class IO_SoundFont_Chunk {
     var $id = null;
     var $data = null;
     var $detail = null;
+    var $_detailParsed = null; // detail as parsed, to see if it was edited
     function getDataSize() {
         return strlen($this->data);
     }
@@ -141,6 +142,107 @@ class IO_SoundFont_Chunk {
             break;
         }
         $this->detail = $detailData;
+        $this->_detailParsed = $detailData;
+    }
+    // record keys starting with '_' are added by analyze, not chunk data
+    static function stripInternalKeys($detail) {
+        foreach ($detail as $idx => $entry) {
+            if (is_array($entry)) {
+                foreach ($entry as $key => $value) {
+                    if (is_string($key) && ($key[0] === '_')) {
+                        unset($detail[$idx][$key]);
+                    }
+                }
+            }
+        }
+        return $detail;
+    }
+    // chunk data for build: the raw data, or the data built from detail
+    // when detail was edited after parseChunkData (or set without it)
+    function buildChunkData() {
+        if (is_null($this->detail) ||
+            ((is_null($this->_detailParsed) === false) &&
+             (self::stripInternalKeys($this->detail) === self::stripInternalKeys($this->_detailParsed)))) {
+            return $this->data;
+        }
+        $detailData = $this->detail;
+        $writer = new IO_Bit();
+        switch ($this->id) {
+            // INFO sub-chunks
+        case 'ifil':
+            $writer->putUI16LE($detailData['sfVersionMajor']);
+            $writer->putUI16LE($detailData['sfVersionMinor']);
+            break;
+        case 'INAM':
+        case 'isng':
+        case 'IENG':
+        case 'ISFT':
+        case 'ICMT':
+        case 'ICOP':
+            $value = reset($detailData);
+            // zstr: NUL terminated, even length
+            if (substr($value, -1) !== "\0") {
+                $value .= "\0";
+            }
+            if (strlen($value) % 2) {
+                $value .= "\0";
+            }
+            $writer->putData($value);
+            break;
+            // sdta sub-chunks
+        case 'smpl':
+            $writer->putData($detailData['Samples']);
+            break;
+            // pdta sub-chunks
+        case 'phdr':
+            foreach ($detailData as $preset) {
+                $writer->putData($preset['PresetName'], 20);
+                $writer->putUI16LE($preset['Preset']);
+                $writer->putUI16LE($preset['Bank']);
+                $writer->putUI16LE($preset['PresetBagNdx']);
+                $writer->putUI32LE($preset['Library']);
+                $writer->putUI32LE($preset['Genre']);
+                $writer->putUI32LE($preset['MorphologyGenre']);
+            }
+            break;
+        case 'pbag':
+        case 'ibag':
+            foreach ($detailData as $bag) {
+                $writer->putUI16LE($bag['GenNdx']);
+                $writer->putUI16LE($bag['ModNdx']);
+            }
+            break;
+        case 'pmod':
+        case 'imod':
+            foreach ($detailData as $sfMod) {
+                IO_SoundFont_Modulator::build($writer, $sfMod['sfModSrcOper']);
+                $writer->putUI16LE($sfMod['sfModDestOper']);
+                $writer->putSI16LE($sfMod['modAmount']);
+                IO_SoundFont_Modulator::build($writer, $sfMod['sfModAmtSrcOper']);
+                $writer->putUI16LE($sfMod['sfModTransOper']);
+            }
+            break;
+        case 'pgen':
+        case 'igen':
+            foreach ($detailData as $sfGen) {
+                IO_SoundFont_Generator::build($writer, $sfGen);
+            }
+            break;
+        case 'inst':
+            foreach ($detailData as $sfInst) {
+                $writer->putData($sfInst['InstName'], 20);
+                $writer->putUI16LE($sfInst['InstBagNdx']);
+            }
+            break;
+        case 'shdr':
+            foreach ($detailData as $sfSample) {
+                IO_SoundFont_Sample::build($writer, $sfSample);
+            }
+            break;
+        default:
+            return $this->data;
+        }
+        return $writer->output();
     }
     function dump() {
         $id = $this->id;

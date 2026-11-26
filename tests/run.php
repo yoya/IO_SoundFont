@@ -223,6 +223,52 @@ foreach (array('default' => sf2(), 'EOP 255' => sf2(array('eop' => 255)),
 }
 
 /*
+ * build: edits to detail are written (parse -> edit -> build -> parse)
+ */
+$orig = sf2();
+$sf = parseSF2($orig);
+$sf->analyze(); // adds '_' keys to some records: not an edit
+$sf->sfbk['INFO']['INAM']->parseChunkData();
+$sf->sfbk['INFO']['INAM']->detail['sfName'] = 'Organ Bank';
+$sf->sfbk['pdta']['phdr']->detail[0]['PresetName'] = 'Organ';
+$sf->sfbk['pdta']['phdr']->detail[0]['Preset'] = 19;
+$sf->sfbk['pdta']['pgen']->detail[1]['Amount'] = -5;    // startAddrsOffset (signed)
+$sf->sfbk['pdta']['pmod']->detail[0]['modAmount'] = -300;
+$sf->sfbk['pdta']['pmod']->detail[0]['sfModSrcOper']['Index'] = 93;
+$sf->sfbk['pdta']['inst']->detail[0]['InstName'] = 'Organ';
+$sf->sfbk['pdta']['shdr']->detail[0]['SampleRate'] = 44100;
+$sf->sfbk['pdta']['shdr']->detail[0]['PitchCorrection'] = -10;
+$sf2 = parseSF2($sf->build());
+$sf2->analyze();
+$sf2->sfbk['INFO']['INAM']->parseChunkData();
+check('edit INAM', "Organ Bank\0\0", $sf2->sfbk['INFO']['INAM']->detail['sfName']);
+check('edit phdr', array('Organ', 19), array($sf2->pdtaMap['phdr'][0][19]['PresetName'], $sf2->pdtaMap['phdr'][0][19]['Preset']));
+check('edit pgen', -5, $sf2->pdtaMap['pgen'][1]['Amount']);
+check('edit pgen instrument', 0, $sf2->pdtaMap['pgen'][0]['Amount']);
+check('edit pmod', array(-300, 93, 1), array($sf2->pdtaMap['pmod'][0]['modAmount'],
+                                             $sf2->pdtaMap['pmod'][0]['sfModSrcOper']['Index'],
+                                             $sf2->pdtaMap['pmod'][0]['sfModSrcOper']['CC']));
+check('edit inst', 'Organ', $sf2->pdtaMap['inst'][0]['InstName']);
+check('edit shdr', array(44100, -10, 'Smp', 32), array($sf2->pdtaMap['shdr'][0]['SampleRate'], $sf2->pdtaMap['shdr'][0]['PitchCorrection'],
+                                                       $sf2->pdtaMap['shdr'][0]['SampleName'], $sf2->pdtaMap['shdr'][0]['End']));
+foreach (array('pbag', 'ibag', 'imod', 'igen') as $id) { // not edited: raw data
+    check("edit: $id unchanged", bin2hex($sf->sfbk['pdta'][$id]->data), bin2hex($sf2->sfbk['pdta'][$id]->data));
+}
+check('edit: smpl unchanged', bin2hex(parseSF2($orig)->sfbk['sdta']['smpl']->data), bin2hex($sf2->sfbk['sdta']['smpl']->data));
+// every record type built from detail without edits gives the same bytes
+$sf = parseSF2($orig);
+$sf->analyze();
+foreach ($sf->sfbk as $listId => $chunkLIST) {
+    foreach ($chunkLIST as $id => $chunk) {
+        $chunk->parseChunkData();
+        $chunk->_detailParsed = null; // force building from detail
+        if (is_null($chunk->detail) === false) {
+            check("build $id from detail", bin2hex($chunk->data), bin2hex($chunk->buildChunkData()));
+        }
+    }
+}
+
+/*
  * generator amounts: signed (shAmount) except the indexes instrument / sampleID
  */
 $chunk = new IO_SoundFont_Chunk();

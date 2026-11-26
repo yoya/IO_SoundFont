@@ -106,7 +106,15 @@ class IO_SoundFont_Generator {
         return $ret;
     }
     static function build(&$writer, $gen) {
-        $writer->putUI16LE('Oper');
-        $writer->putUI16LE($genBit);
+        $sfGenOper = $gen['sfGenOper'];
+        $writer->putUI16LE($sfGenOper);
+        if (($sfGenOper === 43) || ($sfGenOper === 44)) { // keyRange, velRange
+            $writer->putUI8($gen['Lo']);
+            $writer->putUI8($gen['Hi']);
+        } else if (self::isSigned($sfGenOper)) {
+            $writer->putSI16LE($gen['Amount']);
+        } else {
+            $writer->putUI16LE($gen['Amount']);
+        }
     }
 }

@@ -99,10 +99,11 @@ class IO_SoundFont {
             if (strlen($chunk->id) !== 4) {
                 throw new IO_SoundFont_Exception("Illegal ID({$chunk->id}) found");
             }
-            // writes the raw chunk data (changes in detail are not written)
+            // the raw data, or built from detail if it was edited
+            $data = $chunk->buildChunkData();
             $writer->putData($chunk->id);
-            $writer->putUI32LE(strlen($chunk->data));
-            $writer->putData($chunk->data);
+            $writer->putUI32LE(strlen($data));
+            $writer->putData($data);
         }
         list($nextOfData, $dummy) = $writer->getOffset();
         $size = $nextOfData - $startOfSize - 4;

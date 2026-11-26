@@ -42,8 +42,9 @@ class IO_SoundFont_Modulator {
         }
         return $ret;
     }
-    static function build(&$writer, $gen) {
-        $writer->putUI16LE('Oper');
-        $writer->putUI16LE($genBit);
+    static function build(&$writer, $mod) {
+        $sfModBits = ($mod['Type'] << 10) | ($mod['P'] << 9) | ($mod['D'] << 8) |
+                     ($mod['CC'] << 7) | ($mod['Index'] & 0x7f);
+        $writer->putUI16LE($sfModBits);
     }
 }

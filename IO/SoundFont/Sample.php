@@ -45,8 +45,16 @@ class IO_SoundFont_Sample {
         }
         return $ret;
     }
-    static function build(&$writer, $sample) {
-        $writer->putUI16LE('Oper');
-        $writer->putUI16LE($sample);
+    static function build(&$writer, $sample) { // shdr record
+        $writer->putData($sample['SampleName'], 20);
+        $writer->putUI32LE($sample['Start']);
+        $writer->putUI32LE($sample['End']);
+        $writer->putUI32LE($sample['StartLoop']);
+        $writer->putUI32LE($sample['EndLoop']);
+        $writer->putUI32LE($sample['SampleRate']);
+        $writer->putUI8($sample['OriginalPitch']);
+        $writer->putSI8($sample['PitchCorrection']);
+        $writer->putUI16LE($sample['SampleLink']);
+        $writer->putUI16LE($sample['SampleType']);
     }
 }
