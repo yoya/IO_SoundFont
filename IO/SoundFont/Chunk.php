@@ -217,7 +217,11 @@ class IO_SoundFont_Chunk {
         switch ($id) {
         case 'phdr':
             $banks = array();
+            $lastIdx = count($detail) - 1; // terminal 'EOP' record
             foreach ($detail as $idx => $entry) {
+                if ($idx === $lastIdx) {
+                    break;
+                }
                 $bankId = $entry['Bank'];
                 $presetId = $entry['Preset'];
                 if (isset($banks[$bankId]) === false) {

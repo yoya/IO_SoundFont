@@ -44,14 +44,14 @@ function name20($name) {
  * The terminal records (EOP/EOI/EOS) follow the spec recommendation (zeros).
  */
 function sf2($opts = array()) {
-    $o = $opts + array('startLoop' => 8, 'endLoop' => 24);
+    $o = $opts + array('startLoop' => 8, 'endLoop' => 24, 'eop' => 0);
     $info = chunk('ifil', pack('vv', 2, 1)).chunk('INAM', "TestBank\0\0").chunk('ICMT', "hello\0");
     $smpl = '';
     for ($i = 0; $i < 64; $i++) {
         $smpl .= pack('v', $i * 100);
     }
     $phdr = name20('Piano').pack('vvvVVV', 0, 0, 0, 0, 0, 0)
-          . name20('EOP').pack('vvvVVV', 0, 0, 1, 0, 0, 0);
+          . name20('EOP').pack('vvvVVV', $o['eop'], $o['eop'], 1, 0, 0, 0);
     $pbag = pack('vv', 0, 0).pack('vv', 1, 1);
     // src = MIDI CC 91, dest = 16 (reverbEffectsSend), amount = 200
     $pmod = pack('vvsvv', 0x0080 | 91, 16, 200, 0, 0).pack('vvsvv', 0, 0, 0, 0, 0);
@@ -93,6 +93,20 @@ $sf = parseSF2(sf2());
 $sf->sfbk['pdta']['pmod']->parseChunkData();
 check('pmod src Index', array('Type' => 0, 'P' => 0, 'D' => 0, 'CC' => 1, 'Index' => 91),
       $sf->sfbk['pdta']['pmod']->detail[0]['sfModSrcOper']);
+
+/*
+ * the terminal EOP record (bank 0 / preset 0) does not hide the real preset
+ */
+$sf = parseSF2(sf2());
+$sf->analyze();
+$banks = $sf->pdtaMap['phdr'];
+check('phdr banks', array(0), array_keys($banks));
+check('phdr presets', array(0), array_keys($banks[0]));
+check('phdr preset 0/0', array('Piano', 0, 0),
+      array($banks[0][0]['PresetName'], $banks[0][0]['PresetBagNdx'], $banks[0][0]['_PresetBagNdxEnd']));
+$sf = parseSF2(sf2(array('eop' => 255)));
+$sf->analyze();
+check('phdr banks (EOP 255/255)', array(0), array_keys($sf->pdtaMap['phdr']));
 
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);
