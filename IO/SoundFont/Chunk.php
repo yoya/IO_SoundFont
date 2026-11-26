@@ -251,7 +251,7 @@ class IO_SoundFont_Chunk {
                 if (isset($detail[$idx+1])) {
                     $entry['_InstBagNdxEnd'] = $detail[$idx+1]['InstBagNdx'] - 1;
                 } else {
-                    $entry['_InstBagNdxEnd'] = count($sfbk['pdta']['pbag']->detail) - 1;
+                    $entry['_InstBagNdxEnd'] = count($sfbk['pdta']['ibag']->detail) - 1;
                 }
             }
             break;

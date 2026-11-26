@@ -159,5 +159,22 @@ check('sfextractsample no loop: wav', IO_SoundFont_WaveData::makeWaveData($smpl,
 array_map('unlink', glob("$tmpdir/*"));
 rmdir($tmpdir);
 
+/*
+ * analyze: the last inst record ends at the last ibag record (not pbag)
+ */
+$sfbk = array('pdta' => array());
+foreach (array('pbag' => 2, 'ibag' => 3) as $id => $n) {
+    $chunk = new IO_SoundFont_Chunk();
+    $chunk->id = $id;
+    $chunk->detail = array_fill(0, $n, array('GenNdx' => 0, 'ModNdx' => 0));
+    $sfbk['pdta'][$id] = $chunk;
+}
+$chunk = new IO_SoundFont_Chunk();
+$chunk->id = 'inst';
+$chunk->detail = array(array('InstName' => 'Inst', 'InstBagNdx' => 0),
+                       array('InstName' => 'EOI', 'InstBagNdx' => 2));
+$inst = $chunk->analyze($sfbk);
+check('inst _InstBagNdxEnd', array(1, 2), array($inst[0]['_InstBagNdxEnd'], $inst[1]['_InstBagNdxEnd']));
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);
