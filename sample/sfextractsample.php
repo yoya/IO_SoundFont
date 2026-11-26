@@ -85,6 +85,8 @@ function extractGenerator($gen, $looptime) {
         $sampleBits = 16; // 8 or 16
         $waveData = IO_SoundFont_WaveData::makeWaveData($sampleData, $nChannel, $sampleBits, $sampleRate);
         // sample index in the name: different samples can have the same name
+        // path separators, NUL and control characters in the name become '_'
+        $name = preg_replace('/[\/\\\\\x00-\x1f]/', '_', $name);
         file_put_contents($sampleIdx."_".$name.".wav", $waveData);
     }
 }

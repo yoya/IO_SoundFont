@@ -176,6 +176,17 @@ check('sfextractsample same names: files', array('0_Smp.wav', '1_Smp.wav'), $fil
 check('sfextractsample same names: different data', true,
       file_get_contents("$tmpdir/0_Smp.wav") !== file_get_contents("$tmpdir/1_Smp.wav"));
 array_map('unlink', glob("$tmpdir/*"));
+
+/*
+ * sample/sfextractsample.php: path separators in a sample name are not used as paths
+ */
+file_put_contents("$tmpdir/sep.sf2", sf2(array('twoSamples' => "../a/b\\c\x01")));
+list($status, $stdout, $stderr) = runPHP(array("$root/sample/sfextractsample.php", 'sep.sf2'), $tmpdir);
+$files = array_map('basename', glob("$tmpdir/*.wav"));
+sort($files);
+check('sfextractsample path separators: files', array('0_Smp.wav', '1_.._a_b_c_.wav'), $files);
+check('sfextractsample path separators: exit status', 0, $status);
+array_map('unlink', glob("$tmpdir/*"));
 rmdir($tmpdir);
 
 /*
