@@ -20,7 +20,7 @@ class IO_SoundFont_Modulator {
         $p = ($sfModBits >> 9) & 1;
         $d = ($sfModBits >> 8) & 1;
         $cc = ($sfModBits >> 7) & 1;
-        $index = $sfModBits & 0x3f;
+        $index = $sfModBits & 0x7f;
         $sfMod = array(
             'Type' => $type,
             'P' => $p, 'D' => $d, 'CC' => $cc,

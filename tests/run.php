@@ -86,5 +86,13 @@ check('ICMT Comments', "hello\0", $sf->sfbk['INFO']['ICMT']->detail['Comments'])
 $sf->sfbk['sdta']['smpl']->parseChunkData();
 check('smpl Samples length', 128, strlen($sf->sfbk['sdta']['smpl']->detail['Samples']));
 
+/*
+ * modulator source index is 7 bits (MIDI CC 91)
+ */
+$sf = parseSF2(sf2());
+$sf->sfbk['pdta']['pmod']->parseChunkData();
+check('pmod src Index', array('Type' => 0, 'P' => 0, 'D' => 0, 'CC' => 1, 'Index' => 91),
+      $sf->sfbk['pdta']['pmod']->detail[0]['sfModSrcOper']);
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);
