@@ -63,7 +63,7 @@ Bank: idx:0
         Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmdSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controler) TransOper:0
 ```
 
-- sfextractsample.php (プリセットから使われているサンプルを `<サンプル番号>_<サンプル名>.wav` としてカレントディレクトリに書き出す。2 つめの引数を秒数で与えると、ループ区間をその長さ分繰り返す)
+- sfextractsample.php (プリセットから使われているサンプルを `<サンプル番号>_<サンプル名>.wav` (名前の `/`, `\`, 制御文字は `_` に置き換え) としてカレントディレクトリに書き出す。2 つめの引数を秒数で与えると、ループ区間をその長さ分繰り返す)
 
 ```
 % php vendor/yoya/io_soundfont/sample/sfextractsample.php test.sf2 3
@@ -119,7 +119,7 @@ sample[1]: EOS rate:0
   - `pdtaMap['phdr']` は `[バンク][プリセット番号]` でプリセットを引ける形です。最後の終端レコード (EOP) は含みません。
   - そのほか (`pbag`, `inst`, `ibag`, `shdr` など) はレコードの配列で、`_GenNdxEnd` や `_InstBagNdxEnd` のように、次のレコードから求めたインデックスの終わりが付きます。
 - ジェネレータの値 (`Amount`) は、インデックスの instrument, sampleID と未使用・予約のものは符号無し、それ以外は符号付きで読みます。
-- `build()` は各チャンクの `data` をそのまま書き、LIST と RIFF のサイズを付け直します。`detail` を書き換えても出力には反映されません。
+- `build()` は LIST と RIFF のサイズを付け直して書き出します。`parseChunkData()` の後で `detail` を書き換えたチャンクは `detail` から作り直し (名前は NUL で埋めます)、それ以外は `data` をそのまま書きます。何も変えなければ元と同じバイト列になります。
 - `tree()` は `analyze()` の結果を、プリセット → バッグ → ジェネレータ (インストゥルメント → バッグ → ジェネレータ → サンプル) の順に辿って表示します。
 
 # Test

@@ -63,7 +63,7 @@ Bank: idx:0
         Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmdSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controler) TransOper:0
 ```
 
-- sfextractsample.php (writes the samples used by the presets to `<sample index>_<sample name>.wav` in the current directory. With a second argument in seconds, the loop section is repeated for that long)
+- sfextractsample.php (writes the samples used by the presets to `<sample index>_<sample name>.wav` (`/`, `\` and control characters in the name become `_`) in the current directory. With a second argument in seconds, the loop section is repeated for that long)
 
 ```
 % php vendor/yoya/io_soundfont/sample/sfextractsample.php test.sf2 3
@@ -119,7 +119,7 @@ sample[1]: EOS rate:0
   - `pdtaMap['phdr']` is indexed as `[bank][preset number]`. It does not include the terminal record (EOP).
   - The others (`pbag`, `inst`, `ibag`, `shdr`, ...) are record arrays, with the end of each index range computed from the next record, such as `_GenNdxEnd` and `_InstBagNdxEnd`.
 - Generator values (`Amount`) are read unsigned for the indexes instrument and sampleID and for the unused / reserved generators, and signed for all others.
-- `build()` writes the `data` of each chunk as it is and recomputes the LIST and RIFF sizes. Changes to `detail` are not written.
+- `build()` recomputes the LIST and RIFF sizes. A chunk whose `detail` was changed after `parseChunkData()` is built from `detail` (names are NUL padded); the others are written from `data` as they are. Without changes, the output is identical to the input.
 - `tree()` walks the `analyze()` result as preset → bag → generator (→ instrument → bag → generator → sample) and prints it.
 
 # Test
