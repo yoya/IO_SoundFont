@@ -117,5 +117,14 @@ $chunk->data = name20('X').pack('v', 0x8000);
 $chunk->parseChunkData();
 check('inst InstBagNdx unsigned', 0x8000, $chunk->detail[0]['InstBagNdx']);
 
+/*
+ * parse raises no deprecation (no dynamic property)
+ */
+$errors = array();
+set_error_handler(function ($errno, $errstr) use (&$errors) { $errors[] = $errstr; return true; });
+parseSF2(sf2());
+restore_error_handler();
+check('parse no deprecation', array(), $errors);
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

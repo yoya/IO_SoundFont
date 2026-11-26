@@ -17,6 +17,7 @@ require_once dirname(__FILE__).'/SoundFont/Modulator.php';
 require_once dirname(__FILE__).'/SoundFont/Sample.php';
 
 class IO_SoundFont {
+    var $sfbk = null;
     var $pdtaMap = array(); // for analyze
     function parse($sfdata) {
         $reader = new IO_Bit();
