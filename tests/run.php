@@ -207,5 +207,16 @@ foreach ($chunk->detail as $gen) {
 }
 check('generator amounts', array(-5, -500, -12000, -1, 0x8000, 40000, 0xFFFF, array(10, 100)), $amounts);
 
+/*
+ * dump: INFO strings without the NUL padding (detail keeps the raw data)
+ */
+$sf = parseSF2(sf2());
+ob_start();
+$sf->dump();
+$dump = ob_get_clean();
+check('dump INAM no NUL', true, strpos($dump, "sfName: TestBank".PHP_EOL) !== false);
+check('dump ICMT no NUL', true, strpos($dump, "Comments: hello".PHP_EOL) !== false);
+check('dump keeps detail', "TestBank\0\0", $sf->sfbk['INFO']['INAM']->detail['sfName']);
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

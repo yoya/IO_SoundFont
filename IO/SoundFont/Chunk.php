@@ -170,6 +170,7 @@ class IO_SoundFont_Chunk {
         case 'ICMT':
         case 'ICOP':
             foreach ($detailData as $key => $value) {
+                $value = rtrim($value, "\0"); // zstr padding (detail keeps it)
                 echo "      $key: $value".PHP_EOL;
             }
             break;
