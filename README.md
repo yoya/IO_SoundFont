@@ -5,7 +5,7 @@ English version: [README.en.md](README.en.md)
 
 SoundFont 2 (.sf2) を解釈する為の PHP ライブラリです。IO_Bit が必要です。
 チャンク構造のダンプ、プリセット → インストゥルメント → サンプルの木構造の表示、サンプルの WAV への書き出しができます。
-書き出し (build) は未完成です。
+parse した内容をそのまま .sf2 に書き出す (build) こともできます。
 利用に制限はかけません。コピーも改変もご自由にどうぞ。MIT ライセンスにしました。
 自分の環境だと動かないとか、機能が欲しいとかいった要望があれば連絡下さい。
 
@@ -63,7 +63,7 @@ Bank: idx:0
         Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmdSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controler) TransOper:0
 ```
 
-- sfextractsample.php (プリセットから使われているサンプルを `<サンプル名>.wav` としてカレントディレクトリに書き出す。2 つめの引数を秒数で与えると、ループ区間をその長さ分繰り返す)
+- sfextractsample.php (プリセットから使われているサンプルを `<サンプル番号>_<サンプル名>.wav` としてカレントディレクトリに書き出す。2 つめの引数を秒数で与えると、ループ区間をその長さ分繰り返す)
 
 ```
 % php vendor/yoya/io_soundfont/sample/sfextractsample.php test.sf2 3
@@ -74,7 +74,7 @@ name:'Piano' bagNdx: 0=>0
 InstBag: idx:0
 name:'Sine' start:0 loop:16=>48 end:64 sampleRate:22050 originalPitch:60 pitchCorrection:0 link:0 type:1
 % ls *.wav
-Sine.wav
+0_Sine.wav
 ```
 
 - PHP から使う例 (プリセットとサンプルの一覧)
@@ -107,25 +107,20 @@ sample[1]: EOS rate:0
 
 | クラス | 役割 |
 |---|---|
-| `IO_SoundFont` | ファイル全体。RIFF `sfbk` の 3 つの LIST (INFO, sdta, pdta) の parse / dump / analyze / tree |
+| `IO_SoundFont` | ファイル全体。RIFF `sfbk` の 3 つの LIST (INFO, sdta, pdta) の parse / build / dump / analyze / tree |
 | `IO_SoundFont_Chunk` | サブチャンク 1 個 (`ifil`, `INAM`, `smpl`, `phdr`, `pbag`, `pgen`, `inst`, `shdr` など)。中身の解釈と、インデックスの範囲の計算 |
 | `IO_SoundFont_Generator`, `IO_SoundFont_Modulator`, `IO_SoundFont_Sample` | ジェネレータ・モジュレータ・サンプルヘッダのレコードの解釈と文字列化 |
 | `IO_SoundFont_WaveData` | PCM データを WAV ファイルにする |
 | `IO_Bit` (別パッケージ) | バイト・ビット単位の読み書き |
 
 - `parse()` は `sfbk` に、LIST ごとにサブチャンク ID → `IO_SoundFont_Chunk` の配列を入れます。各チャンクは生のデータ (`data`) を持ちます。
-- `parseChunkData()` (`dump()` と `analyze()` が呼ぶ) は、データをレコードの配列 (`detail`) に解釈し、`data` を空にします。
+- `parseChunkData()` (`dump()` と `analyze()` が呼ぶ) は、データをレコードの配列 (`detail`) に解釈します。`data` はそのまま残ります。
 - `analyze()` は pdta のチャンクを解釈して `pdtaMap` に入れます。
   - `pdtaMap['phdr']` は `[バンク][プリセット番号]` でプリセットを引ける形です。最後の終端レコード (EOP) は含みません。
   - そのほか (`pbag`, `inst`, `ibag`, `shdr` など) はレコードの配列で、`_GenNdxEnd` や `_InstBagNdxEnd` のように、次のレコードから求めたインデックスの終わりが付きます。
+- ジェネレータの値 (`Amount`) は、インデックスの instrument, sampleID と未使用・予約のものは符号無し、それ以外は符号付きで読みます。
+- `build()` は各チャンクの `data` をそのまま書き、LIST と RIFF のサイズを付け直します。`detail` を書き換えても出力には反映されません。
 - `tree()` は `analyze()` の結果を、プリセット → バッグ → ジェネレータ (インストゥルメント → バッグ → ジェネレータ → サンプル) の順に辿って表示します。
-
-# 既知の制限
-
-- `build()` は未完成で、動きません。
-- ジェネレータの値 (`Amount`) は符号無しで読みます。符号付きのジェネレータ (fineTune, pan など) の負の値は 65535 に近い数になります。
-- `dump()` は INFO の文字列を、終わりの NUL も含めてそのまま表示します。
-- `sfextractsample.php` はファイル中のサンプル名をそのままファイル名に使います。同じ名前のサンプルは上書きされます。
 
 # Test
 

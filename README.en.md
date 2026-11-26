@@ -5,7 +5,7 @@ Japanese version: [README.md](README.md)
 
 A PHP library for interpreting SoundFont 2 (.sf2) files. It requires IO_Bit.
 It can dump the chunk structure, show the preset → instrument → sample tree, and write samples out as WAV files.
-Writing (build) is not finished.
+It can also write the parsed content back to an .sf2 file (build).
 Not limited in use, free to copy and modify under the MIT license.
 Please contact me if it does not work in your environment or if you want new features.
 
@@ -63,7 +63,7 @@ Bank: idx:0
         Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmdSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controler) TransOper:0
 ```
 
-- sfextractsample.php (writes the samples used by the presets to `<sample name>.wav` in the current directory. With a second argument in seconds, the loop section is repeated for that long)
+- sfextractsample.php (writes the samples used by the presets to `<sample index>_<sample name>.wav` in the current directory. With a second argument in seconds, the loop section is repeated for that long)
 
 ```
 % php vendor/yoya/io_soundfont/sample/sfextractsample.php test.sf2 3
@@ -74,7 +74,7 @@ name:'Piano' bagNdx: 0=>0
 InstBag: idx:0
 name:'Sine' start:0 loop:16=>48 end:64 sampleRate:22050 originalPitch:60 pitchCorrection:0 link:0 type:1
 % ls *.wav
-Sine.wav
+0_Sine.wav
 ```
 
 - Using it from PHP (list presets and samples)
@@ -107,25 +107,20 @@ sample[1]: EOS rate:0
 
 | Class | Role |
 |---|---|
-| `IO_SoundFont` | The whole file. parse / dump / analyze / tree of the three LISTs (INFO, sdta, pdta) of RIFF `sfbk` |
+| `IO_SoundFont` | The whole file. parse / build / dump / analyze / tree of the three LISTs (INFO, sdta, pdta) of RIFF `sfbk` |
 | `IO_SoundFont_Chunk` | One sub-chunk (`ifil`, `INAM`, `smpl`, `phdr`, `pbag`, `pgen`, `inst`, `shdr`, ...). Interprets its contents and computes index ranges |
 | `IO_SoundFont_Generator`, `IO_SoundFont_Modulator`, `IO_SoundFont_Sample` | Interpret and stringify generator, modulator and sample header records |
 | `IO_SoundFont_WaveData` | Wraps PCM data into a WAV file |
 | `IO_Bit` (separate package) | Byte and bit level reading and writing |
 
 - `parse()` fills `sfbk` with, for each LIST, an array of sub-chunk ID → `IO_SoundFont_Chunk`. Each chunk holds its raw data (`data`).
-- `parseChunkData()` (called by `dump()` and `analyze()`) interprets the data into an array of records (`detail`) and empties `data`.
+- `parseChunkData()` (called by `dump()` and `analyze()`) interprets the data into an array of records (`detail`). `data` is kept.
 - `analyze()` interprets the pdta chunks into `pdtaMap`.
   - `pdtaMap['phdr']` is indexed as `[bank][preset number]`. It does not include the terminal record (EOP).
   - The others (`pbag`, `inst`, `ibag`, `shdr`, ...) are record arrays, with the end of each index range computed from the next record, such as `_GenNdxEnd` and `_InstBagNdxEnd`.
+- Generator values (`Amount`) are read unsigned for the indexes instrument and sampleID and for the unused / reserved generators, and signed for all others.
+- `build()` writes the `data` of each chunk as it is and recomputes the LIST and RIFF sizes. Changes to `detail` are not written.
 - `tree()` walks the `analyze()` result as preset → bag → generator (→ instrument → bag → generator → sample) and prints it.
-
-# Known limitations
-
-- `build()` is not finished and does not work.
-- Generator values (`Amount`) are read unsigned. Negative values of signed generators (fineTune, pan, ...) show as numbers near 65535.
-- `dump()` prints INFO strings as they are, including the trailing NULs.
-- `sfextractsample.php` uses the sample name from the file as the file name. Samples with the same name overwrite each other.
 
 # Test
 
