@@ -11,6 +11,7 @@ if (is_readable($root.'/vendor/autoload.php')) {
 }
 set_include_path($root.PATH_SEPARATOR.get_include_path());
 require_once 'IO/SoundFont.php';
+require_once 'IO/SoundFont/WaveData.php';
 
 $failed = 0;
 $passed = 0;
@@ -69,6 +70,21 @@ function sf2($opts = array()) {
     return 'RIFF'.pack('V', strlen($body)).$body;
 }
 
+// run php in a child process in directory $cwd
+function runPHP($args, $cwd) {
+    $cmd = array(PHP_BINARY, '-d', 'display_errors=stderr',
+                 '-d', 'include_path='.get_include_path());
+    $cmd = implode(' ', array_map('escapeshellarg', array_merge($cmd, $args)));
+    $proc = proc_open($cmd, array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w')), $pipes, $cwd);
+    fclose($pipes[0]);
+    $stdout = stream_get_contents($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    $status = proc_close($proc);
+    return array($status, $stdout, $stderr);
+}
+
 function parseSF2($data) {
     $sf = new IO_SoundFont();
     $sf->parse($data);
@@ -125,6 +141,23 @@ set_error_handler(function ($errno, $errstr) use (&$errors) { $errors[] = $errst
 parseSF2(sf2());
 restore_error_handler();
 check('parse no deprecation', array(), $errors);
+
+/*
+ * sample/sfextractsample.php: looptime with an unlooped sample (EndLoop == StartLoop)
+ */
+$tmpdir = sys_get_temp_dir().'/iosoundfont'.getmypid();
+mkdir($tmpdir);
+file_put_contents("$tmpdir/noloop.sf2", sf2(array('startLoop' => 0, 'endLoop' => 0)));
+list($status, $stdout, $stderr) = runPHP(array("$root/sample/sfextractsample.php", 'noloop.sf2', '1'), $tmpdir);
+check('sfextractsample no loop: exit status', 0, $status);
+$wav = is_readable("$tmpdir/Smp.wav") ? file_get_contents("$tmpdir/Smp.wav") : null;
+$smpl = '';
+for ($i = 0; $i <= 32; $i++) {
+    $smpl .= pack('v', $i * 100);
+}
+check('sfextractsample no loop: wav', IO_SoundFont_WaveData::makeWaveData($smpl, 1, 16, 22050), $wav);
+array_map('unlink', glob("$tmpdir/*"));
+rmdir($tmpdir);
 
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

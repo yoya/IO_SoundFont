@@ -70,7 +70,7 @@ function extractGenerator($gen, $looptime) {
         $start = $sample['Start'];
         $end   = $sample['End'];
         $data = $sf->sfbk['sdta']['smpl']->data;
-        if (is_null($looptime)) {
+        if (is_null($looptime) || ($sample['EndLoop'] <= $sample['StartLoop'])) { // no loop
             $sampleData = substr($data, $start * 2 , ($end-$start + 1) * 2);
         } else {
             $startLoop = $sample['StartLoop'];
