@@ -24,6 +24,7 @@ class IO_SoundFont_Chunk {
         $id = $this->id;
         $reader = new IO_Bit();
         $reader->input($this->data);
+        $data = $this->data;
         $this->data = null; // XXX
         switch($id) {
             // INFO sub-chunks
@@ -32,26 +33,26 @@ class IO_SoundFont_Chunk {
             $detailData['sfVersionMinor'] = $reader->getUI16LE();
             break;
         case 'INAM':
-            $detailData['sfName'] = $this->data; // String
+            $detailData['sfName'] = $data; // String
             break;
         case 'isng':
-            $detailData['sfEngine'] = $this->data; // String
+            $detailData['sfEngine'] = $data; // String
             break;
         case 'IENG':
-            $detailData['sfEngineers'] = $this->data; // String
+            $detailData['sfEngineers'] = $data; // String
             break;
         case 'ISFT':
-            $detailData['sfTools'] = $this->data; // String
+            $detailData['sfTools'] = $data; // String
             break;
         case 'ICMT':
-            $detailData['Comments'] = $this->data; // String
+            $detailData['Comments'] = $data; // String
             break;
         case 'ICOP':
-            $detailData['Copyright'] = $this->data; // String
+            $detailData['Copyright'] = $data; // String
             break;
             // sdta sub-chunks
         case 'smpl':
-            $detailData['Samples'] = $this->data; // String
+            $detailData['Samples'] = $data; // String
             break;
             // pdta sub-chunks
         case 'phdr':
