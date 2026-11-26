@@ -86,6 +86,9 @@ class IO_SoundFont {
         $this->buildChunkLIST($writer, 'INFO', $this->sfbk['INFO']);
         $this->buildChunkLIST($writer, 'sdta', $this->sfbk['sdta']);
         $this->buildChunkLIST($writer, 'pdta', $this->sfbk['pdta']);
+        list($nextOfData, $dummy) = $writer->getOffset();
+        $writer->setUI32LE($nextOfData - 8, 4); // RIFF size
+        return $writer->output();
     }
     function buildChunkLIST($writer, $id_LIST, $chunkLIST) {
         $writer->putData('LIST');
@@ -93,12 +96,13 @@ class IO_SoundFont {
         $writer->putUI32LE(0); //
         $writer->putData($id_LIST);
         foreach ($chunkLIST as $chunk) {
-            if (strlen($chunk['ID']) !== 4) {
-                throw new IO_SoundFont_Exception("Illegal ID({$chunk['ID']}) found");
+            if (strlen($chunk->id) !== 4) {
+                throw new IO_SoundFont_Exception("Illegal ID({$chunk->id}) found");
             }
-            $writer->putData($chunk['ID']); 
-            $writer->putUI32LE(strlen($chunk['Data']));
-            $writer->putData($chunk['Data']);
+            // writes the raw chunk data (changes in detail are not written)
+            $writer->putData($chunk->id);
+            $writer->putUI32LE(strlen($chunk->data));
+            $writer->putData($chunk->data);
         }
         list($nextOfData, $dummy) = $writer->getOffset();
         $size = $nextOfData - $startOfSize - 4;

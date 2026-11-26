@@ -45,8 +45,9 @@ function name20($name) {
  * The terminal records (EOP/EOI/EOS) follow the spec recommendation (zeros).
  */
 function sf2($opts = array()) {
-    $o = $opts + array('startLoop' => 8, 'endLoop' => 24, 'eop' => 0);
-    $info = chunk('ifil', pack('vv', 2, 1)).chunk('INAM', "TestBank\0\0").chunk('ICMT', "hello\0");
+    $o = $opts + array('startLoop' => 8, 'endLoop' => 24, 'eop' => 0,
+                       'info' => chunk('INAM', "TestBank\0\0").chunk('ICMT', "hello\0"));
+    $info = chunk('ifil', pack('vv', 2, 1)).$o['info'];
     $smpl = '';
     for ($i = 0; $i < 64; $i++) {
         $smpl .= pack('v', $i * 100);
@@ -175,6 +176,22 @@ $chunk->detail = array(array('InstName' => 'Inst', 'InstBagNdx' => 0),
                        array('InstName' => 'EOI', 'InstBagNdx' => 2));
 $inst = $chunk->analyze($sfbk);
 check('inst _InstBagNdxEnd', array(1, 2), array($inst[0]['_InstBagNdxEnd'], $inst[1]['_InstBagNdxEnd']));
+
+/*
+ * build: parse -> build is byte-identical (also after dump / analyze / tree)
+ */
+$allInfo = chunk('isng', "EMU8000\0").chunk('INAM', "TestBank\0\0").chunk('IENG', "someone\0")
+         . chunk('ISFT', "tool:tool\0").chunk('ICMT', "hello\0").chunk('ICOP', "(c) 2026\0\0");
+foreach (array('default' => sf2(), 'EOP 255' => sf2(array('eop' => 255)),
+               'all INFO strings' => sf2(array('info' => $allInfo))) as $name => $data) {
+    $sf = parseSF2($data);
+    check("build $name", bin2hex($data), bin2hex($sf->build()));
+    ob_start();
+    $sf->dump();
+    $sf->tree();
+    ob_end_clean();
+    check("build $name after dump and tree", bin2hex($data), bin2hex($sf->build()));
+}
 
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

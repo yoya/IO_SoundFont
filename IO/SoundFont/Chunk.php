@@ -24,8 +24,7 @@ class IO_SoundFont_Chunk {
         $id = $this->id;
         $reader = new IO_Bit();
         $reader->input($this->data);
-        $data = $this->data;
-        $this->data = null; // XXX
+        $data = $this->data; // kept for build
         switch($id) {
             // INFO sub-chunks
         case 'ifil':
