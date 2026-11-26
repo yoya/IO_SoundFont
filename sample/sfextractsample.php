@@ -84,7 +84,8 @@ function extractGenerator($gen, $looptime) {
         $nChannel = 1; // 1:monoral, 2:stereo
         $sampleBits = 16; // 8 or 16
         $waveData = IO_SoundFont_WaveData::makeWaveData($sampleData, $nChannel, $sampleBits, $sampleRate);
-        file_put_contents($name.".wav", $waveData);
+        // sample index in the name: different samples can have the same name
+        file_put_contents($sampleIdx."_".$name.".wav", $waveData);
     }
 }
 

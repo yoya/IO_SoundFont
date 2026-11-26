@@ -62,8 +62,14 @@ function sf2($opts = array()) {
     $ibag = pack('vv', 0, 0).pack('vv', 1, 0);
     $imod = pack('vvsvv', 0, 0, 0, 0, 0);
     $igen = pack('vv', 53, 0).pack('vv', 0, 0);
-    $shdr = name20('Smp').pack('VVVVVCcvv', 0, 32, $o['startLoop'], $o['endLoop'], 22050, 60, 0, 0, 1)
-          . name20('EOS').pack('VVVVVCcvv', 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    $shdr = name20('Smp').pack('VVVVVCcvv', 0, 32, $o['startLoop'], $o['endLoop'], 22050, 60, 0, 0, 1);
+    if (isset($o['twoSamples'])) { // two instrument zones, the 2nd sample is named $o['twoSamples']
+        $inst = name20('Inst').pack('v', 0).name20('EOI').pack('v', 2);
+        $ibag = pack('vv', 0, 0).pack('vv', 1, 0).pack('vv', 2, 0);
+        $igen = pack('vv', 53, 0).pack('vv', 53, 1).pack('vv', 0, 0);
+        $shdr .= name20($o['twoSamples']).pack('VVVVVCcvv', 33, 63, 33, 33, 22050, 60, 0, 0, 1);
+    }
+    $shdr .= name20('EOS').pack('VVVVVCcvv', 0, 0, 0, 0, 0, 0, 0, 0, 0);
     $pdta = chunk('phdr', $phdr).chunk('pbag', $pbag).chunk('pmod', $pmod).chunk('pgen', $pgen)
           . chunk('inst', $inst).chunk('ibag', $ibag).chunk('imod', $imod).chunk('igen', $igen)
           . chunk('shdr', $shdr);
@@ -151,12 +157,24 @@ mkdir($tmpdir);
 file_put_contents("$tmpdir/noloop.sf2", sf2(array('startLoop' => 0, 'endLoop' => 0)));
 list($status, $stdout, $stderr) = runPHP(array("$root/sample/sfextractsample.php", 'noloop.sf2', '1'), $tmpdir);
 check('sfextractsample no loop: exit status', 0, $status);
-$wav = is_readable("$tmpdir/Smp.wav") ? file_get_contents("$tmpdir/Smp.wav") : null;
+$wav = is_readable("$tmpdir/0_Smp.wav") ? file_get_contents("$tmpdir/0_Smp.wav") : null;
 $smpl = '';
 for ($i = 0; $i <= 32; $i++) {
     $smpl .= pack('v', $i * 100);
 }
 check('sfextractsample no loop: wav', IO_SoundFont_WaveData::makeWaveData($smpl, 1, 16, 22050), $wav);
+array_map('unlink', glob("$tmpdir/*"));
+
+/*
+ * sample/sfextractsample.php: two samples with the same name are both written
+ */
+file_put_contents("$tmpdir/dup.sf2", sf2(array('twoSamples' => 'Smp')));
+list($status, $stdout, $stderr) = runPHP(array("$root/sample/sfextractsample.php", 'dup.sf2'), $tmpdir);
+$files = array_map('basename', glob("$tmpdir/*.wav"));
+sort($files);
+check('sfextractsample same names: files', array('0_Smp.wav', '1_Smp.wav'), $files);
+check('sfextractsample same names: different data', true,
+      file_get_contents("$tmpdir/0_Smp.wav") !== file_get_contents("$tmpdir/1_Smp.wav"));
 array_map('unlink', glob("$tmpdir/*"));
 rmdir($tmpdir);
 
