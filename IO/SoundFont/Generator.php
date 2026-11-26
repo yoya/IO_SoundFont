@@ -1,6 +1,7 @@
 <?php
 
 
+global $IO_SoundFont_Generator_Summary; // also when loaded inside a function (Composer autoload)
 $IO_SoundFont_Generator_Summary = array(
     0 => array('Name' => 'startAddrsOffset'),
     1 => array('Name' => 'endAddrsOffset'),

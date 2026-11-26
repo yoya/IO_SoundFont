@@ -236,5 +236,17 @@ check('dump INAM no NUL', true, strpos($dump, "sfName: TestBank".PHP_EOL) !== fa
 check('dump ICMT no NUL', true, strpos($dump, "Comments: hello".PHP_EOL) !== false);
 check('dump keeps detail', "TestBank\0\0", $sf->sfbk['INFO']['INAM']->detail['sfName']);
 
+/*
+ * name tables work when the library is loaded inside a function (Composer autoload)
+ */
+$tmpfile = tempnam(sys_get_temp_dir(), 'iosoundfont');
+file_put_contents($tmpfile, sf2());
+list($status, $stdout, $stderr) = runPHP(array('-r', 'function load($f) { require_once $f; } load($argv[1]); $sf = new IO_SoundFont(); $sf->parse(file_get_contents($argv[2])); $sf->tree();',
+                                               "$root/IO/SoundFont.php", $tmpfile), sys_get_temp_dir());
+unlink($tmpfile);
+check('tree in function scope: generator name', true, strpos($stdout, "genOper:41(instrument)") !== false);
+check('tree in function scope: sample type', true, strpos($stdout, "type:1(monoSample)") !== false);
+check('tree in function scope: modulator dest', true, strpos($stdout, "DestOper:16(reverbEffectsSend)") !== false);
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

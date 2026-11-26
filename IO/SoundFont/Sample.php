@@ -1,6 +1,7 @@
 <?php
 
 
+global $IO_SoundFont_Sample_Type; // also when loaded inside a function (Composer autoload)
 $IO_SoundFont_Sample_Type = array(
     1 => 'monoSample',
     2 => 'rightSample',
