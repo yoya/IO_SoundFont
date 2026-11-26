@@ -73,13 +73,22 @@ class IO_SoundFont_Generator {
         $sfGen = array();
         $sfGenOper = $reader->getUI16LE();
         $sfGen['sfGenOper'] = $sfGenOper;
-        if (($sfGenOper === 43) || ($sfGenOper === 44)) {
+        if (($sfGenOper === 43) || ($sfGenOper === 44)) { // keyRange, velRange
             $sfGen['Lo'] = $reader->getUI8();
             $sfGen['Hi'] = $reader->getUI8();
+        } else if (self::isSigned($sfGenOper)) {
+            $sfGen['Amount'] = $reader->getSI16LE(); // shAmount
         } else {
-            $sfGen['Amount'] = $reader->getUI16LE(); // XXX: SI ???
+            $sfGen['Amount'] = $reader->getUI16LE(); // wAmount
         }
         return $sfGen;
+    }
+    // shAmount (signed) generators: all defined value generators.
+    // instrument(41) and sampleID(53) are indexes (wAmount), and the
+    // unused / reserved ones have no defined type (read as unsigned).
+    static function isSigned($genOper) {
+        static $notSigned = array(14, 18, 19, 20, 41, 42, 49, 53, 55, 59, 60);
+        return ($genOper <= 60) && (in_array($genOper, $notSigned, true) === false);
     }
     static function string($gen) {
         global $IO_SoundFont_Generator_Summary;

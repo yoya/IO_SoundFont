@@ -193,5 +193,19 @@ foreach (array('default' => sf2(), 'EOP 255' => sf2(array('eop' => 255)),
     check("build $name after dump and tree", bin2hex($data), bin2hex($sf->build()));
 }
 
+/*
+ * generator amounts: signed (shAmount) except the indexes instrument / sampleID
+ */
+$chunk = new IO_SoundFont_Chunk();
+$chunk->id = 'igen';
+$chunk->data = pack('vs', 52, -5).pack('vs', 17, -500).pack('vs', 33, -12000).pack('vs', 58, -1)
+             . pack('vv', 53, 0x8000).pack('vv', 41, 40000).pack('vv', 14, 0xFFFF).pack('vCC', 43, 10, 100);
+$chunk->parseChunkData();
+$amounts = array();
+foreach ($chunk->detail as $gen) {
+    $amounts[] = isset($gen['Amount']) ? $gen['Amount'] : array($gen['Lo'], $gen['Hi']);
+}
+check('generator amounts', array(-5, -500, -12000, -1, 0x8000, 40000, 0xFFFF, array(10, 100)), $amounts);
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);
