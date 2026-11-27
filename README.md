@@ -133,3 +133,9 @@ IO_Bit は `vendor/` (composer install した場合) か include_path から読�
 # Reference
 
 - SoundFont 2.01 Technical Specification
+
+## IO_Bit の利用箇所
+
+RIFF のサイズや SoundFont の整数フィールドにリトルエンディアンの読み書きを使います。
+
+[IO_Bit Wiki](https://github.com/yoya/IO_Bit/wiki)
