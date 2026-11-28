@@ -60,7 +60,7 @@ Bank: idx:0
                 genOper:53(sampleID) Amount:0
                 name:'Sine' start:0 loop:16=>48 end:64 sampleRate:22050 originalPitch:60 pitchCorrection:0 link:0 type:1(monoSample)
       Mod: idx:0 
-        Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmdSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controler) TransOper:0
+        Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmtSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controller) TransOper:0
 ```
 
 - sfextractsample.php (プリセットから使われているサンプルを `<サンプル番号>_<サンプル名>.wav` (名前の `/`, `\`, 制御文字は `_` に置き換え) としてカレントディレクトリに書き出す。2 つめの引数を秒数で与えると、ループ区間をその長さ分繰り返す)

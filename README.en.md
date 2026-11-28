@@ -60,7 +60,7 @@ Bank: idx:0
                 genOper:53(sampleID) Amount:0
                 name:'Sine' start:0 loop:16=>48 end:64 sampleRate:22050 originalPitch:60 pitchCorrection:0 link:0 type:1(monoSample)
       Mod: idx:0 
-        Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmdSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controler) TransOper:0
+        Type:0 P:0 D:0 CC:1 Index:91 DestOper:16(reverbEffectsSend) Amount:200 AmtSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controller) TransOper:0
 ```
 
 - sfextractsample.php (writes the samples used by the presets to `<sample index>_<sample name>.wav` (`/`, `\` and control characters in the name become `_`) in the current directory. With a second argument in seconds, the loop section is repeated for that long)
