@@ -133,3 +133,9 @@ IO_Bit is loaded from `vendor/` (after composer install) or include_path.
 # Reference
 
 - SoundFont 2.01 Technical Specification
+
+## Use of IO_Bit
+
+Little-endian reads and writes are used for the RIFF sizes and the integer fields of SoundFont.
+
+[IO_Bit Wiki](https://github.com/yoya/IO_Bit/wiki)
