@@ -1,6 +1,6 @@
 <?php
   /*
-    IO_SoundFont - v2.1.0
+    IO_SoundFont - v2.1.1
     (c) yoya@awm.jp
    http://pwiki.awm.jp/~yoya/?SoundFont   
    */
