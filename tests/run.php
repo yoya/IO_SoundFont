@@ -400,6 +400,7 @@ check('bank: tree generators', true, strpos($out, "genOper:17(pan) Amount:-250".
 check('bank: tree sample', true, strpos($out, "name:'SmpB' start:78 loop:80=>90 end:94 sampleRate:22050 originalPitch:36 pitchCorrection:3 link:0 type:1(monoSample)".PHP_EOL) !== false);
 check('bank: tree modulators', true, strpos($out, "Type:0 P:1 D:0 CC:0 Index:14(Pitch Wheel) DestOper:52(fineTune) Amount:-100") !== false
                                    && strpos($out, "Type:1 P:0 D:1 CC:0 Index:2(Note-On Velocity) DestOper:48(initialAttenuation) Amount:960") !== false);
+check('bank: tree modulator amount source', true, strpos($out, "DestOper:16(reverbEffectsSend) Amount:200 AmtSrcOper:Type:0 P:0 D:0 CC:0 Index:0(No Controller) TransOper:0") !== false);
 check('bank: tree sample count', 3, substr_count($out, "type:1(monoSample)"));
 
 // edit: change records, build, parse again; other chunks keep their bytes

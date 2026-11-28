@@ -2,7 +2,7 @@
 
 global $IO_SoundFont_Modulator_Index; // also when loaded inside a function (Composer autoload)
 $IO_SoundFont_Modulator_Index = array( // C:0
-    0 => 'No Controler',
+    0 => 'No Controller',
     2 => 'Note-On Velocity',
     3 => 'Note-On Key Number',
     10 => 'Poly Pressure',

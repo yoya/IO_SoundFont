@@ -184,7 +184,7 @@ class IO_SoundFont {
             $text .= '('.$IO_SoundFont_Generator_Summary[$destOper]['Name'].')';
         }
         $text .= " Amount:$amount";
-        $text .= ' AmdSrcOper:'.IO_SoundFont_Modulator::string($mod['sfModAmtSrcOper']);
+        $text .= ' AmtSrcOper:'.IO_SoundFont_Modulator::string($mod['sfModAmtSrcOper']);
         $text .= " TransOper:$transOper";
         echo $indentSpace.$text.PHP_EOL;
     }
