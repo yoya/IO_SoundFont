@@ -510,5 +510,13 @@ check('sfextractsample looptime: attack + loop', substr($smplA, 0, 8 * 2).str_re
 array_map('unlink', glob("$tmpdir/*"));
 rmdir($tmpdir);
 
+/*
+ * generator names follow the SoundFont 2 specification
+ */
+foreach (array(20 => 'unused4', 31 => 'keynumToModEnvHold', 32 => 'keynumToModEnvDecay',
+               39 => 'keynumToVolEnvHold', 40 => 'keynumToVolEnvDecay') as $oper => $name) {
+    check("generator name $oper", "genOper:$oper($name) Amount:0", IO_SoundFont_Generator::string(array('sfGenOper' => $oper, 'Amount' => 0)));
+}
+
 echo "passed: $passed, failed: $failed".PHP_EOL;
 exit($failed ? 1 : 0);

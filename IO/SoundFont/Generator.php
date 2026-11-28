@@ -23,7 +23,7 @@ $IO_SoundFont_Generator_Summary = array(
     17 => array('Name' => 'pan'),
     18 => array('Name' => 'unused2'), // unused, reserved.
     19 => array('Name' => 'unused3'), // unused, reserved.
-    20 => array('Name' => 'unued4'),  // unused, reserved.
+    20 => array('Name' => 'unused4'), // unused, reserved.
     21 => array('Name' => 'delayModLFO'),
     22 => array('Name' => 'freqModLFO'),
     23 => array('Name' => 'delayVibLFO'),
@@ -35,14 +35,14 @@ $IO_SoundFont_Generator_Summary = array(
     29 => array('Name' => 'sustainModEnv'),
     30 => array('Name' => 'releaseModEnv'),
     31 => array('Name' => 'keynumToModEnvHold'),
-    32 => array('Name' => 'keynumToMovEnvDecay'),
+    32 => array('Name' => 'keynumToModEnvDecay'),
     33 => array('Name' => 'delayVolEnv'),
     34 => array('Name' => 'attackVolEnv'),
     35 => array('Name' => 'holdVolEnv'),
     36 => array('Name' => 'decayVolEnv'),
     37 => array('Name' => 'sustainVolEnv'),
     38 => array('Name' => 'releaseVolEnv'),
-    39 => array('Name' => 'keunumToVolEnvHold'),
+    39 => array('Name' => 'keynumToVolEnvHold'),
     40 => array('Name' => 'keynumToVolEnvDecay'),
     41 => array('Name' => 'instrument'), // link to instrument
     42 => array('Name' => 'reserved1'), // unused, reserved.
